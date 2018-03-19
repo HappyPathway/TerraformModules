@@ -19,12 +19,13 @@ data "aws_subnet" "private_subnet" {
 }
 
 resource "aws_instance" "bastion" {
-  ami           = "${data.aws_ami.ubuntu.id}"
-  instance_type = "${var.instance_type}"
+  ami               = "${data.aws_ami.ubuntu.id}"
+  instance_type     = "${var.instance_type}"
   availability_zone = "${data.aws_subnet.private_subnet.availability_zone}"
-  subnet_id = "${var.public_subnet_id}"
-  security_groups = ["${aws_security_group.bastion.id}"]
-  key_name                    = "${var.key_name}"
+  subnet_id         = "${var.public_subnet_id}"
+  security_groups   = ["${aws_security_group.bastion.id}"]
+  key_name          = "${var.key_name}"
+
   tags {
     Name           = "BastionHost"
     private_subnet = "${var.private_subnet_id}"
