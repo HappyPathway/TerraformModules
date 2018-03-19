@@ -1,0 +1,32 @@
+{
+  "variables": {
+    "source_ami": "ami-43a15f3e",
+    "instance_type": "t2.micro",
+    "org_name": "",
+    "company_name": "",
+    "service_name": ""
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "us-east-1",
+      "source_ami": "{{user `source_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "ubuntu",
+      "ami_name": "{{user `company_name`}}-{{user `org_name`}}-{{user `service_name`}}",
+      "force_deregister": true,
+      "snapshot_tags": {
+        "Name": "{{user `company_name`}}-{{user `org_name`}}-{{user `service_name`}}",
+        "company_name": "{{user `company_name`}}",
+        "org_name": "{{user `org_name`}}",
+        "service_name": "{{user `service_name`}}"
+      },
+      "tags": {
+        "Name": "{{user `company_name`}}-{{user `org_name`}}-{{user `service_name`}}",
+        "company_name": "{{user `company_name`}}",
+        "org_name": "{{user `org_name`}}",
+        "service_name": "{{user `service_name`}}"
+      }
+    }
+  ]
+}
