@@ -88,3 +88,11 @@ variable "connection_draining" {
 variable "idle_timeout" {
   default = 400
 }
+
+variable "set_dns" {
+  default = false
+}
+
+variable "enable_ssl" {
+  default = false
+}

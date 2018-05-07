@@ -5,8 +5,8 @@
 #    Environment = "${var.company_name}-${var.org_name}"
 #  }
 #}
-resource "aws_elb" "service" {
-  count           = "${var.enable_ssl ? 0 : 1}"
+resource "aws_elb" "ssl_service" {
+  count           = "${var.enable_ssl ? 1 : 0}"
   name            = "${var.company_name}-${var.org_name}-${var.service_name}"
   subnets         = ["${var.private_subnet_id}"]
   security_groups = ["${aws_security_group.service.id}"]
@@ -23,7 +23,8 @@ resource "aws_elb" "service" {
     lb_port           = "${var.service_port}"
 
     # lb_protocol = "${var.lb_protocol}"
-    lb_protocol        = "http"
+    lb_protocol        = "https"
+    ssl_certificate_id = "${data.aws_acm_certificate.service.arn}"
   }
   health_check {
     healthy_threshold   = "${var.service_healthcheck_healthy_threshold}"
@@ -42,7 +43,7 @@ resource "aws_elb" "service" {
 }
 
 resource "aws_lb_cookie_stickiness_policy" "cookie_stickness" {
-  count           = "${var.enable_ssl ? 0 : 1}"
+  count           = "${var.enable_ssl ? 1 : 0}"
   name                     = "${var.company_name}-${var.org_name}-${var.service_name}-cookiestickness"
   load_balancer            = "${aws_elb.service.id}"
   lb_port                  = "${var.service_port}"
