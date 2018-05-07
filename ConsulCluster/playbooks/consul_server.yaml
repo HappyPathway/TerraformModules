@@ -1,0 +1,51 @@
+---
+- hosts: localhost
+  vars:
+     consul_config_dir: /etc/consul.d/
+     consul_data_dir: /opt/consul/data
+     consul_log_file: /opt/consul/logs/consul.log
+     consul_home: /opt/consul
+     consul_config_file: /etc/consul.d/consul-default.json
+     consul_join_tag: consul_datacenter
+     consul_acl: false
+     consul_server: false
+     consul_node_key_id: AKIAIZNQEOVAKC6RO3IA
+     consul_node_key_secret: 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
+      
+  tasks:
+    - name: what host?
+      debug: msg="{{ ansible_hostname }}:{{ ansible_default_ipv4.address }}"
+
+    - name: download consul agent
+      get_url: url=https://releases.hashicorp.com/consul/1.0.7/consul_1.0.7_linux_amd64.zip dest=/tmp/consul_1.0.7_linux_amd64.zip
+
+    - name: install unzip
+      apt: name=unzip state=installed
+      when: ansible_os_family == "Debian"
+
+    - name: unzip consul
+      unarchive:
+        src: /tmp/consul_1.0.7_linux_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+
+    - name: create proper directories
+      file: path={{ item }} state=directory mode=0755
+      with_items:
+        - "{{ consul_config_dir }}"
+        - "{{ consul_data_dir }}"
+    
+    - name: setup config file
+      template: src=consul-default.json.j2 dest={{ consul_config_file }} mode=0755 owner=root
+
+    - name: install supervisor
+      apt: name=supervisor state=installed
+
+    - name: upload consul supervisord script
+      copy: src=consul.conf dest=/etc/supervisor/conf.d/consul.conf
+
+    - name: load consul with supervisord
+      shell: "{{ item }}"
+      with_items:
+        - supervisorctl reread
+        - supervisorctl update

@@ -1,0 +1,35 @@
+---
+- hosts: localhost
+  tasks:
+    - name: download vault
+      get_url: url=https://releases.hashicorp.com/vault/0.10.1/vault_0.10.1_linux_amd64.zip dest=/tmp/vault_0.10.1_linux_amd64.zip
+  
+    - name: install unzip
+      apt: name=unzip state=installed
+      when: ansible_os_family == "Debian"
+
+    - name: unzip vault
+      unarchive:
+        src: /tmp/vault_0.10.1_linux_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+
+    - name: create proper directories
+      file: path={{ item }} state=directory mode=0755
+      with_items:
+        - /etc/vault/
+    
+    - name: setup config file
+      template: src=vault.conf.j2 dest=/etc/vault/vault.conf mode=0755 owner=root
+
+    - name: install supervisor
+      apt: name=supervisor state=installed
+
+    - name: upload vault supervisord script
+      copy: src=vault.conf dest=/etc/supervisor/conf.d/vault.conf
+
+    - name: load vault with supervisord
+      shell: "{{ item }}"
+      with_items:
+        - supervisorctl reread
+        - supervisorctl update

@@ -1,0 +1,43 @@
+{
+  "variables": {
+    "source_ami": "ami-43a15f3e",
+    "instance_type": "t2.micro",
+    "consul_cluster": "dc1",
+    "region": "us-east-1"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "source_ami": "{{user `source_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "ubuntu",
+      "ami_name": "consul-{{user `consul_cluster`}}",
+      "force_deregister": true,
+      "snapshot_tags": {
+        "service": "consul",
+        "cluster": "{{user `consul_cluster`}}"
+      },
+      "tags": {
+        "service": "consul",
+        "cluster": "{{user `consul_cluster`}}"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "playbooks",
+      "destination": "/tmp/playbooks"
+    },
+    {
+      "type": "shell",
+      "inline": [
+          "sudo apt-get update",
+          "sudo apt-get install -y python-pip",
+          "sudo pip install -r /tmp/playbooks/requirements.txt",
+          "sudo ansible-playbook /tmp/playbooks/consul_server.yaml -c local -e consul_cluster={{user `consul_cluster`}} -e region={{user `region`}}"
+      ]
+    }	
+  ]
+}
