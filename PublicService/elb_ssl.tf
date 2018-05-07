@@ -42,7 +42,7 @@ resource "aws_elb" "ssl_service" {
   }
 }
 
-resource "aws_lb_cookie_stickiness_policy" "cookie_stickness" {
+resource "aws_lb_cookie_stickiness_policy" "ssl_cookie_stickness" {
   count           = "${var.enable_ssl ? 1 : 0}"
   name                     = "${var.company_name}-${var.org_name}-${var.service_name}-cookiestickness"
   load_balancer            = "${aws_elb.service.id}"

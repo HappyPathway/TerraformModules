@@ -90,9 +90,9 @@ variable "idle_timeout" {
 }
 
 variable "set_dns" {
-  default = false
+  default = true
 }
 
 variable "enable_ssl" {
-  default = false
+  default = true
 }
