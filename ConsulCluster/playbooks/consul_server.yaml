@@ -9,8 +9,6 @@
      consul_join_tag: consul_datacenter
      consul_acl: false
      consul_server: false
-     consul_node_key_id: AKIAIZNQEOVAKC6RO3IA
-     consul_node_key_secret: 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
       
   tasks:
     - name: what host?
